@@ -26,6 +26,15 @@ class Road {
         return this.left + laneWidth/2 + Math.min(laneIndex, this.laneCount - 1) * laneWidth;
     }
 
+    getClosestLane(car) {
+        const dists = [];
+        for (var i = 0; i < this.laneCount; i++) {
+            const laneCenter = this.getLaneCenter(i);
+            dists.push(Math.abs(laneCenter - car.x));
+        }
+        return dists.indexOf(Math.min(...dists));
+    }
+
     draw(ctx) {
         ctx.lineWidth = 5;
         ctx.strokeStyle = "white";
