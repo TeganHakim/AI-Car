@@ -37,8 +37,8 @@ function addTraffic() {
         const random = Math.random();
         initialPos -= Math.floor(Math.random() * (250 - 100 + 1) + 100);
         if (random < 0.75) {
-            let randomLane = Math.floor(Math.random() * 2);
-            traffic.push(new Car(road.getLaneCenter(randomLane), initialPos, 30, 50, "DUMMY", 2));
+            let randomLane = Math.floor(Math.random() * 3);
+            traffic.push(new Car(road.getLaneCenter(randomLane >= 2 ? 2 : randomLane), initialPos, 30, 50, "DUMMY", 2));
         } else {
             let randomLane = Math.floor(Math.random() * 3);
             traffic.push(new Car(road.getLaneCenter(randomLane), initialPos, 30, 50, "DUMMY", 2));
