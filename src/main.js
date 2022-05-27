@@ -6,7 +6,7 @@ const ctx = canvas.getContext("2d");
 
 const road = new Road(canvas.width/2, canvas.width * 0.90);
 
-const n = 1;
+const n = 200;
 const mutationRate = 0.1;
 
 const cars = generateCars(n);
