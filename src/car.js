@@ -68,20 +68,12 @@ class Car {
             y: this.y - Math.cos(this.angle - alpha) * rad 
         });
         points.push({
-            x: this.x - Math.sin(this.angle - alpha/8) * rad * 1.25,
-            y: this.y - Math.cos(this.angle - alpha/8) * rad * 1.25
-        });
-        points.push({
             x: this.x - Math.sin(this.angle + alpha) * rad,
             y: this.y - Math.cos(this.angle + alpha) * rad
         });
         points.push({
             x: this.x - Math.sin(Math.PI + this.angle - alpha) * rad,
             y: this.y - Math.cos(Math.PI + this.angle - alpha) * rad
-        });
-        points.push({
-            x: this.x - Math.sin(Math.PI + this.angle - alpha/8) * rad * 1.25,
-            y: this.y - Math.cos(Math.PI + this.angle - alpha/8) * rad * 1.25
         });
         points.push({
             x: this.x - Math.sin(Math.PI + this.angle + alpha) * rad,
