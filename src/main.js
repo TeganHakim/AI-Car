@@ -11,6 +11,10 @@ let initialPos = -100;
 const n = 200;
 const mutationRate = 0.1;
 
+let damagedCars = 0;
+let timeElapsed = 0;
+const reloadTime = 1000;
+
 const cars = generateCars(n);
 let bestCar = cars[0];
 
@@ -47,6 +51,26 @@ function addTraffic() {
     }
 }
 
+function checkDamaged() {
+    for (let i = 0; i < cars.length; i++) {
+        if (cars.damaged) {
+            damagedCars += 1;
+        }
+    }
+    let tempDamagedCars = damagedCars;
+    if (timeElapsed >= reloadTime) {
+        if (damagedCars == tempDamagedCars) {
+            save();
+            location.reload();
+        }
+        timeElapsed = 0;
+    }
+    if (damagedCars == cars.length && timeElapsed > 0) {
+        location.reload();
+    }
+
+}
+
 function save() {
     localStorage.setItem(
         "bestBrain", 
@@ -73,7 +97,8 @@ function generateCars(n) {
 }
 
 function animate() {
-
+    timeElapsed += 1;
+    checkDamaged();
     
     for (let i = 0; i < traffic.length; i++) {
         traffic[i].update(road.borders, []);
