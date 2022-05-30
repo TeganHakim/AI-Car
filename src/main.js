@@ -13,7 +13,7 @@ const mutationRate = 0.1;
 
 let damagedCars = 0;
 let timeElapsed = 0;
-const reloadTime = 1000;
+const reloadTime = 2000;
 
 const cars = generateCars(n);
 let bestCar = cars[0];
