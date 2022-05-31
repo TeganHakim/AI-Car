@@ -1,9 +1,12 @@
 class Car {
     constructor(x, y, width, height, controlType, maxSpeed = 3) {
+        this.fitness;
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
+        this.controlType = controlType;
+        this.radius = 50;
 
         this.speed = 0;
         this.turnSpeed = 0.02;
@@ -14,6 +17,7 @@ class Car {
         this.damaged = false;
         
         this.useBrain = controlType == "AI";
+        this.expoRate = 4;
 
         if (controlType != "DUMMY") {
             this.sensor = new Sensor(this);
@@ -27,6 +31,7 @@ class Car {
             this.#move();
             this.polygon = this.#createPolygon();
             this.damaged = this.#assessDamage(roadBorders, traffic);
+            this.stayCenter = !this.#checkRadius(traffic);
         }
         if (this.sensor) {
             this.sensor.update(roadBorders, traffic);
@@ -44,6 +49,23 @@ class Car {
         }
     }
 
+    calculateFitness(road) {
+        this.fitness = Math.pow(mapValues(-1 * (this.y), [0, road.infinity], [0, 1]), this.expoRate);
+            
+        if (this.damaged) {
+            this.fitness = 0;
+        }
+    }      
+
+    #checkRadius(traffic) {
+        for (let i = 0; i < traffic.length; i++) {
+            if (Math.hypot(this.x - traffic[i].x, this.y - traffic[i].y) < this.radius) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     #assessDamage(roadBorders, traffic) {
         for (let i = 0; i < roadBorders.length; i++) {
             if (polysIntersect(this.polygon, roadBorders[i])) {
@@ -54,6 +76,9 @@ class Car {
             if (polysIntersect(this.polygon, traffic[i].polygon)) {
                 return true;
             }
+        }
+        if (this.y > 0) {
+            return true;
         }
         return false;
     }
@@ -121,9 +146,18 @@ class Car {
 
         this.x -= Math.sin(this.angle) * this.speed;
         this.y -= Math.cos(this.angle) * this.speed;
+
+        const giveDist = 10 + Math.abs(this.speed);
+        if (this.stayCenter) {
+            if ((road.getLaneCenter(road.getClosestLane(this)) - this.x) > giveDist) {
+                this.angle -= this.turnSpeed;
+            } else if ((road.getLaneCenter(road.getClosestLane(this)) - this.x) < -giveDist) {
+                this.angle += this.turnSpeed;
+            }
+        }
     }
 
-    draw(ctx, color, drawSensor = false) {
+    draw(ctx, color, drawSensor = false, drawRadius = false) {
         if (this.damaged) {
             ctx.fillStyle = "grey";
         } else {
@@ -138,6 +172,12 @@ class Car {
 
         if (this.sensor && drawSensor) {
             this.sensor.draw(ctx);
+        }
+
+        if (drawRadius) {
+            ctx.beginPath();
+            ctx.ellipse(this.x, this.y, this.radius, this.radius, 0, 0, 2 * Math.PI);
+            ctx.stroke();
         }
     }
 }

@@ -33,3 +33,16 @@ button:hover {
 #myCanvas {
     background: lightgrey;
 }
+
+div.stats {
+    position: absolute;
+    left: 0;
+    top: 0;
+    border: 1px solid black;
+    padding: 15px;
+    padding-right: 100px;
+}
+
+div.stats h3, div.stats p {
+    display: inline;
+}

@@ -7,9 +7,9 @@ class Road {
         this.left = x - width/2;
         this.right = x + width/2;
 
-        const infinity = 10000000;
-        this.top = -infinity;
-        this.bottom = infinity;
+        this.infinity = 10000000;
+        this.top = -this.infinity;
+        this.bottom = this.infinity;
 
         const topLeft = {x: this.left, y: this.top};
         const topRight = {x: this.right, y: this.top};
