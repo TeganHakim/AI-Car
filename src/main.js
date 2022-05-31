@@ -36,9 +36,7 @@ if (localStorage.getItem("generation")) {
     generation = localStorage.getItem("generation");
 }
 
-const traffic = [
-    new Car(road.getLaneCenter(1), -100, 30, 50, "DUMMY", 2)
-];
+const traffic = [];
 
 addTraffic();
 animate();
