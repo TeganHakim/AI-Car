@@ -8,7 +8,6 @@ const fitnessText = document.getElementById("fitness");
 const ctx = canvas.getContext("2d");
 let generation = 1;
 
-
 const road = new Road(canvas.width/2, canvas.width * 0.90);
 const numTraffic = 100;
 let initialPos = -100;
@@ -82,8 +81,7 @@ function checkDamaged() {
         }
         timeElapsed = 0;
     }
-    console.log(damagedCars);
-    if (damagedCars == cars.length - 1 && timeElapsed > 0) {
+    if (damagedCars >= cars.length - 1 && timeElapsed > 0) {
         location.reload();
     }
 
