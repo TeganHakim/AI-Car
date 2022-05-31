@@ -6,7 +6,7 @@ class Car {
         this.width = width;
         this.height = height;
         this.controlType = controlType;
-        this.radius = 50;
+        this.radius = 75;
 
         this.speed = 0;
         this.turnSpeed = 0.02;

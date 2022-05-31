@@ -4,13 +4,14 @@ canvas.width = 200;
 
 const generationText = document.getElementById("generation");
 const fitnessText = document.getElementById("fitness");
+const bestFitnessText = document.getElementById("best-fitness");
 
 const ctx = canvas.getContext("2d");
 let generation = 1;
 
 const road = new Road(canvas.width/2, canvas.width * 0.90);
 const numTraffic = 100;
-let initialPos = -100;
+let initialPos = 50;
 
 const n = 100;
 const mutationRate = 0.1;
@@ -152,6 +153,14 @@ function animate() {
 
     generationText.innerHTML = generation;
     fitnessText.innerHTML = averageFitness();
+    bestFitnessText.innerHTML = parseInt(bestCar.fitness);
 
     requestAnimationFrame(animate);
 }
+
+document.addEventListener('keydown', e => {
+    if (e.ctrlKey && e.key === 's') {
+      e.preventDefault();
+      save();
+    }
+  });
