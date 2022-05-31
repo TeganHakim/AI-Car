@@ -8,7 +8,7 @@ const road = new Road(canvas.width/2, canvas.width * 0.90);
 const numTraffic = 100;
 let initialPos = -100;
 
-const n = 200;
+const n = 100;
 const mutationRate = 0.1;
 
 let damagedCars = 0;
