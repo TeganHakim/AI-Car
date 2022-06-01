@@ -2,11 +2,13 @@ const canvas = document.getElementById("myCanvas");
 canvas.height = window.innerHeight;
 canvas.width = 200;
 
+let startTime = Date.now();;
 const frameRate = 144;
 
 const generationText = document.getElementById("generation");
 const fitnessText = document.getElementById("fitness");
 const bestFitnessText = document.getElementById("best-fitness");
+const distanceText = document.getElementById("distance");
 const mutationText = document.getElementById("mutation");
 const speedText = document.getElementById("speed");
 const radiusText = document.getElementById("radius");
@@ -24,7 +26,7 @@ let mutationRate = 0.1;
 
 let damagedCars = 0;
 let timeElapsed = 0;
-const reloadTime = 10000;
+let distance = 0;
 
 const cars = generateCars(n);
 let bestCar = cars[0];
@@ -78,31 +80,24 @@ function checkDamaged() {
             damagedCars += 1;
         }
     }
-    let tempDamagedCars = damagedCars;
-    if (timeElapsed >= reloadTime) {
-        if (damagedCars == tempDamagedCars) {
-            save();
-            location.reload();
-        }
-        timeElapsed = 0;
-    }
-    if (damagedCars >= cars.length - 1 && timeElapsed > 0) {
+    if (damagedCars >= cars.length && timeElapsed > 0) {
         save();
         location.reload();
         mutationRate = (mutationRate == 0.1) ? 0.2 : 0.1;
     }
-
+    
 }
 
 function save() {
     localStorage.setItem(
         "bestBrain", 
         JSON.stringify(bestCar.brain)
-    );
-    localStorage.setItem(
-        "generation",
-        parseInt(generation) + 1
-    );
+        );
+        localStorage.setItem(
+            "generation",
+            parseInt(generation) + 1
+            );
+            document.getElementById("bestBrain").value = JSON.stringify(bestCar.brain, null, "\t");
 }
 
 function discard() {
@@ -119,66 +114,70 @@ function generateCars(n) {
             30,
             50,
             "AI"
-        ));
+            ));
+        }
+        return cars;
     }
-    return cars;
-}
-
-function animate() {
-    setTimeout(function() {      
-        timeElapsed += 1;
-        checkDamaged();
-        
-        for (let i = 0; i < traffic.length; i++) {
-            traffic[i].update(road.borders, []);
-        }
-        for (let i = 0; i < cars.length; i++) {
-            cars[i].update(road.borders, traffic);
-            cars[i].calculateFitness(road);
-        }       
-        
-        bestCar = cars.find(
-            c => c.fitness == Math.max(...cars.map(c => c.fitness))
-            );
+    
+    function animate() {
+        setTimeout(function() { 
+            checkDamaged();
             
+            for (let i = 0; i < traffic.length; i++) {
+                traffic[i].update(road.borders, []);
+            }
             for (let i = 0; i < cars.length; i++) {
-                if (cars[i].y > bestCar.y + 200) {
-                    cars[i].damaged = true;
-                }
-        }   
-        
-        canvas.height = window.innerHeight;
-        
-        ctx.save()
-        ctx.translate(0, -bestCar.y + canvas.height * 0.80);
-        
-        road.draw(ctx);
-        for (let i = 0; i < traffic.length; i++) {
-            traffic[i].draw(ctx, "red");
-        }
-        
-        ctx.globalAlpha = 0.2;
-        for (let i = 0; i < cars.length; i++) {
-            cars[i].draw(ctx, "blue");
-        }
-        ctx.globalAlpha = 1;
-        bestCar.draw(ctx, "blue", true, true);
-        
-        ctx.restore();
-        
-        generationText.innerHTML = generation;
-        fitnessText.innerHTML = averageFitness();
-        bestFitnessText.innerHTML = parseInt(bestCar.fitness);
-        mutationText.innerHTML = mutationRate + " (" + mutationRate * 100 + "%)";
-        speedText.innerHTML = bestCar.maxSpeed;
-        radiusText.innerHTML = bestCar.radius;
-        timeText.innerHTML = parseInt(timeElapsed / frameRate) + "s (" + frameRate + "fps)";
-        
-        requestAnimationFrame(animate);
-    }, 1000 / frameRate);
-}
+                cars[i].update(road.borders, traffic);
+                cars[i].calculateFitness(road);
+            }       
+            
+            bestCar = cars.find(
+                c => c.fitness == Math.max(...cars.map(c => c.fitness))
+                );
+                
+                for (let i = 0; i < cars.length; i++) {
+                    if (cars[i].y > bestCar.y + 200) {
+                        cars[i].damaged = true;
+                    }
+                }   
+                
+                canvas.height = window.innerHeight;
+                
+                ctx.save()
+                ctx.translate(0, -bestCar.y + canvas.height * 0.80);
+            
+            road.draw(ctx);
+            for (let i = 0; i < traffic.length; i++) {
+                traffic[i].draw(ctx, "red");
+            }
+            
+            ctx.globalAlpha = 0.2;
+            for (let i = 0; i < cars.length; i++) {
+                cars[i].draw(ctx, "blue");
+            }
+            ctx.globalAlpha = 1;
+            bestCar.draw(ctx, "blue", true, true);
+            
+            ctx.restore();
+            
+            generationText.innerHTML = generation;
+            fitnessText.innerHTML = averageFitness();
+            bestFitnessText.innerHTML = parseInt(bestCar.fitness);
+            
+            distance = Math.abs(bestCar.y * (1.644 * Math.pow(10, -7)));
+            distanceText.innerHTML = parseFloat(distance).toFixed(4) + "mi";
+            mutationText.innerHTML = mutationRate + " (" + mutationRate * 100 + "%)";
+            speedText.innerHTML = bestCar.maxSpeed;
+            radiusText.innerHTML = bestCar.radius;
 
-document.addEventListener('keydown', e => {
+            timeElapsed = (Date.now() - startTime) / 1000;
+            timeText.innerHTML = parseInt(timeElapsed) + "s (" + frameRate + "fps)";
+            
+            requestAnimationFrame(animate);
+        }, timeElapsed != 0 ? (1000 / frameRate) : 0);
+    }
+    
+    document.addEventListener('keydown', e => {
     if (e.ctrlKey && e.key === 's') {
         e.preventDefault();
         save();

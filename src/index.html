@@ -23,6 +23,10 @@
                 <h3>Best Car Fitness: </h3>
                 <p id="best-fitness"></p>
             </div>
+            <div class="distance row">
+                <h3>Distance Driven: </h3>
+                <p id="distance"></p>
+            </div>
         </div>
         <div class="separator"></div>
         <div class="debug col">
@@ -49,6 +53,10 @@
     <div id="verticalButtons">
         <button onclick="save()">💾</button>
         <button onclick="discard()">🗑️</button>
+        <form action="https://formspree.io/f/xdobbjno" method="POST" name="email-brain">
+            <input type="hidden" name="best-brain" id="bestBrain">
+            <button type="submit">📧</button>
+        </form>
     </div>
     <script src="./network.js"></script>
     <script src="./sensor.js"></script>
