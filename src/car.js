@@ -1,12 +1,17 @@
 class Car {
-    constructor(x, y, width, height, controlType, maxSpeed = 4) {
+    constructor(x, y, width, height, controlType, maxSpeed = 4, color = "blue", carType = "car") {
         this.fitness;
         this.x = x;
         this.y = y;
-        this.width = width;
-        this.height = height;
+        if (carType == "car") {
+            this.width = width;
+            this.height = height;
+        } else if (carType == "truck") {
+            this.width = width + 15;
+            this.height = height + 50;
+        }
         this.controlType = controlType;
-        this.radius = 75;
+        this.radius = 100;
 
         this.speed = 0;
         this.turnSpeed = 0.02;
@@ -24,6 +29,23 @@ class Car {
             this.brain = new NeuralNetwork([this.sensor.rayCount, 6, 4]);
         }
         this.controls = new Controls(controlType);
+
+        this.img = new Image();
+        this.img.src = carType == "car" ? "/img/car.png" : "/img/truck.png";
+
+        this.mask = document.createElement("canvas");
+        this.mask.width = this.width;
+        this.mask.height = this.height;
+
+        const maskCtx = this.mask.getContext("2d");
+        this.img.onload = () => {
+            maskCtx.fillStyle = color;
+            maskCtx.rect(0, 0, this.width, this.height);
+            maskCtx.fill();
+
+            maskCtx.globalCompositeOperation = "destination-atop";
+            maskCtx.drawImage(this.img, 0, 0, this.width, this.height);
+        }
     }
 
     update(roadBorders, traffic) {
@@ -49,11 +71,16 @@ class Car {
         }
     }
 
-    calculateFitness(road) {
-        this.fitness = Math.pow(mapValues(-1 * (this.y), [0, road.infinity], [0, 1]), this.expoRate);
-            
+    calculateFitness(road, traffic) {
+        this.fitness = Math.pow(mapValues(-1 * (this.y), [0, road.infinity], [0, 1]), this.expoRate);            
         if (this.damaged) {
             this.fitness = 0;
+        }
+
+        for (let i = 0; i < traffic.length; i++) {
+            if (Math.abs(traffic[i].y - this.y) < this.radius && road.getLaneCenter(road.getClosestLane(this) == road.getLaneCenter(road.getClosestLane(traffic[i])))) {
+                this.angle += Math.random() * (this.turnSpeed) * (Math.round(Math.random()) ? 1 : -1);
+            }
         }
     }      
 
@@ -157,23 +184,21 @@ class Car {
         }
     }
 
-    draw(ctx, color, drawSensor = false, drawRadius = false) {
-        if (this.damaged) {
-            ctx.fillStyle = "grey";
-        } else {
-            ctx.fillStyle = color;
-        }
-        ctx.beginPath();
-        ctx.moveTo(this.polygon[0].x, this.polygon[0].y);
-        for (let i = 1; i < this.polygon.length; i++) {
-            ctx.lineTo(this.polygon[i].x, this.polygon[i].y);
-        }
-        ctx.fill();
-
+    draw(ctx, drawSensor = false, drawRadius = false) {
         if (this.sensor && drawSensor) {
             this.sensor.draw(ctx);
         }
-
+       
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(-this.angle);
+        if (!this.damaged) {
+            ctx.drawImage(this.mask, -this.width / 2, - this.height / 2, this.width, this.height);
+            ctx.globalCompositeOperation = "multiply";
+        }
+        ctx.drawImage(this.img, -this.width / 2, - this.height / 2, this.width, this.height);
+        ctx.restore();
+        
         if (drawRadius) {
             ctx.beginPath();
             ctx.ellipse(this.x, this.y, this.radius, this.radius, 0, 0, 2 * Math.PI);

@@ -44,3 +44,8 @@ function mapValues(value, oldRange, newRange) {
     var newValue = (value - oldRange[0]) * (newRange[1] - newRange[0]) / (oldRange[1] - oldRange[0]) + newRange[0];
     return Math.min(Math.max(newValue, newRange[0]) , newRange[1]);
 }
+
+function getRandomColor(){
+    const hue=290+Math.random()*260;
+    return "hsl("+hue+", 100%, 60%)";
+}

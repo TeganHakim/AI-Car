@@ -2,8 +2,11 @@ const canvas = document.getElementById("myCanvas");
 canvas.height = window.innerHeight;
 canvas.width = 200;
 
-let startTime = Date.now();;
-const frameRate = 144;
+let startTime = Date.now();
+
+const maxFrameRate = 144;
+let frameRate = 144;
+const slowRate = 4;
 
 const generationText = document.getElementById("generation");
 const fitnessText = document.getElementById("fitness");
@@ -56,11 +59,11 @@ function addTraffic() {
         initialPos -= Math.floor(Math.random() * (250 - 100 + 1) + 100);
         if (random < 0.75) {
             let randomLane = Math.floor(Math.random() * 3.5);
-            traffic.push(new Car(road.getLaneCenter(randomLane >= 2 ? 2 : randomLane), initialPos, 30, 50, "DUMMY", 2));
+            traffic.push(new Car(road.getLaneCenter(randomLane >= 2 ? 2 : randomLane), initialPos, 30, 50, "DUMMY", 2, getRandomColor(), Math.random() >= 0.1 ? "car" : "truck"));
         } else {
             let randomLane = Math.floor(Math.random() * 3.5);
-            traffic.push(new Car(road.getLaneCenter(randomLane), initialPos, 30, 50, "DUMMY", 2));
-            traffic.push(new Car(road.getLaneCenter(randomLane >= 2 ? randomLane + 1 : 0), initialPos, 30, 50, "DUMMY", 2));
+            traffic.push(new Car(road.getLaneCenter(randomLane), initialPos, 30, 50, "DUMMY", 2, getRandomColor(), Math.random() >= 0.1 ? "car" : "truck"));
+            traffic.push(new Car(road.getLaneCenter(randomLane < 2 ? randomLane + 1 : 0), initialPos, 30, 50, "DUMMY", 2, getRandomColor(), Math.random() >= 0.25 ? "car" : "truck"));
         }
     }
 }
@@ -98,6 +101,7 @@ function save() {
             parseInt(generation) + 1
             );
             document.getElementById("bestBrain").value = JSON.stringify(bestCar.brain, null, "\t");
+    location.reload();
 }
 
 function discard() {
@@ -128,7 +132,7 @@ function generateCars(n) {
             }
             for (let i = 0; i < cars.length; i++) {
                 cars[i].update(road.borders, traffic);
-                cars[i].calculateFitness(road);
+                cars[i].calculateFitness(road, traffic);
             }       
             
             bestCar = cars.find(
@@ -148,15 +152,15 @@ function generateCars(n) {
             
             road.draw(ctx);
             for (let i = 0; i < traffic.length; i++) {
-                traffic[i].draw(ctx, "red");
+                traffic[i].draw(ctx);
             }
             
             ctx.globalAlpha = 0.2;
             for (let i = 0; i < cars.length; i++) {
-                cars[i].draw(ctx, "blue");
+                cars[i].draw(ctx);
             }
             ctx.globalAlpha = 1;
-            bestCar.draw(ctx, "blue", true, true);
+            bestCar.draw(ctx, true, true);
             
             ctx.restore();
             
@@ -178,8 +182,16 @@ function generateCars(n) {
     }
     
     document.addEventListener('keydown', e => {
-    if (e.ctrlKey && e.key === 's') {
-        e.preventDefault();
-        save();
-    }
-});
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            save();
+        } else if (e.keyCode == 32) {
+            frameRate = maxFrameRate / slowRate;
+        }
+    });
+
+    document.addEventListener('keyup', e => {
+        if (e.keyCode == 32) {
+            frameRate = maxFrameRate;
+        }
+    });
