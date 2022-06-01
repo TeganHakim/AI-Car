@@ -8,15 +8,42 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="stats">
-        <h3>Generation: </h3>
-        <p id="generation">0</p>
-        <br>
-        <h3>Average Fitness: </h3>
-        <p id="fitness">0</p>
-        <br>
-        <h3>Best Car Fitness: </h3>
-        <p id="best-fitness">0</p>
+    <div class="info-box">
+        <div class="stats col">
+            <h2><u>Stats:</u></h2>
+            <div class="generation row">
+                <h3>Generation: </h3>
+                <p id="generation"></p>
+            </div>
+            <div class="fitness row">
+                <h3>Average Fitness: </h3>
+                <p id="fitness"></p>
+            </div>
+            <div class="best-fitness row">
+                <h3>Best Car Fitness: </h3>
+                <p id="best-fitness"></p>
+            </div>
+        </div>
+        <div class="separator"></div>
+        <div class="debug col">
+            <h2><u>Debug:</u></h2>
+            <div class="mutation row">
+                <h3>Mutation Rate: </h3>
+                <p id="mutation"></p>
+            </div>
+            <div class="speed row">
+                <h3>Max Speed: </h3>
+                <p id="speed"></p>
+            </div>
+            <div class="radius row">
+                <h3>Detect Radius: </h3>
+                <p id="radius"></p>
+            </div>
+            <div class="time row">
+                <h3>Time Elapsed: </h3>
+                <p id="time"></p>
+            </div>
+        </div>
     </div>
     <canvas id="myCanvas"></canvas>
     <div id="verticalButtons">

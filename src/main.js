@@ -2,9 +2,15 @@ const canvas = document.getElementById("myCanvas");
 canvas.height = window.innerHeight;
 canvas.width = 200;
 
+const frameRate = 144;
+
 const generationText = document.getElementById("generation");
 const fitnessText = document.getElementById("fitness");
 const bestFitnessText = document.getElementById("best-fitness");
+const mutationText = document.getElementById("mutation");
+const speedText = document.getElementById("speed");
+const radiusText = document.getElementById("radius");
+const timeText = document.getElementById("time");
 
 const ctx = canvas.getContext("2d");
 let generation = 1;
@@ -14,7 +20,7 @@ const numTraffic = 100;
 let initialPos = 50;
 
 const n = 100;
-const mutationRate = 0.1;
+let mutationRate = 0.1;
 
 let damagedCars = 0;
 let timeElapsed = 0;
@@ -81,7 +87,9 @@ function checkDamaged() {
         timeElapsed = 0;
     }
     if (damagedCars >= cars.length - 1 && timeElapsed > 0) {
+        save();
         location.reload();
+        mutationRate = (mutationRate == 0.1) ? 0.2 : 0.1;
     }
 
 }
@@ -117,50 +125,62 @@ function generateCars(n) {
 }
 
 function animate() {
-    timeElapsed += 1;
-    checkDamaged();
-    
-    for (let i = 0; i < traffic.length; i++) {
-        traffic[i].update(road.borders, []);
-    }
-    for (let i = 0; i < cars.length; i++) {
-        cars[i].update(road.borders, traffic);
-        cars[i].calculateFitness(road);
-    }       
-    
-    bestCar = cars.find(
-       c => c.fitness == Math.max(...cars.map(c => c.fitness))
-    );
+    setTimeout(function() {      
+        timeElapsed += 1;
+        checkDamaged();
+        
+        for (let i = 0; i < traffic.length; i++) {
+            traffic[i].update(road.borders, []);
+        }
+        for (let i = 0; i < cars.length; i++) {
+            cars[i].update(road.borders, traffic);
+            cars[i].calculateFitness(road);
+        }       
+        
+        bestCar = cars.find(
+            c => c.fitness == Math.max(...cars.map(c => c.fitness))
+            );
             
-    canvas.height = window.innerHeight;
+            for (let i = 0; i < cars.length; i++) {
+                if (cars[i].y > bestCar.y + 200) {
+                    cars[i].damaged = true;
+                }
+        }   
         
-    ctx.save()
-    ctx.translate(0, -bestCar.y + canvas.height * 0.80);
+        canvas.height = window.innerHeight;
         
-    road.draw(ctx);
-    for (let i = 0; i < traffic.length; i++) {
-        traffic[i].draw(ctx, "red");
-    }
+        ctx.save()
+        ctx.translate(0, -bestCar.y + canvas.height * 0.80);
         
-    ctx.globalAlpha = 0.2;
-    for (let i = 0; i < cars.length; i++) {
-        cars[i].draw(ctx, "blue");
-    }
-    ctx.globalAlpha = 1;
-    bestCar.draw(ctx, "blue", true, true);
+        road.draw(ctx);
+        for (let i = 0; i < traffic.length; i++) {
+            traffic[i].draw(ctx, "red");
+        }
         
-    ctx.restore();
-
-    generationText.innerHTML = generation;
-    fitnessText.innerHTML = averageFitness();
-    bestFitnessText.innerHTML = parseInt(bestCar.fitness);
-
-    requestAnimationFrame(animate);
+        ctx.globalAlpha = 0.2;
+        for (let i = 0; i < cars.length; i++) {
+            cars[i].draw(ctx, "blue");
+        }
+        ctx.globalAlpha = 1;
+        bestCar.draw(ctx, "blue", true, true);
+        
+        ctx.restore();
+        
+        generationText.innerHTML = generation;
+        fitnessText.innerHTML = averageFitness();
+        bestFitnessText.innerHTML = parseInt(bestCar.fitness);
+        mutationText.innerHTML = mutationRate + " (" + mutationRate * 100 + "%)";
+        speedText.innerHTML = bestCar.maxSpeed;
+        radiusText.innerHTML = bestCar.radius;
+        timeText.innerHTML = parseInt(timeElapsed / frameRate) + "s (" + frameRate + "fps)";
+        
+        requestAnimationFrame(animate);
+    }, 1000 / frameRate);
 }
 
 document.addEventListener('keydown', e => {
     if (e.ctrlKey && e.key === 's') {
-      e.preventDefault();
-      save();
+        e.preventDefault();
+        save();
     }
-  });
+});

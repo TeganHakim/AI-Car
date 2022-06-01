@@ -10,15 +10,17 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    font-family: 'Courier New', Courier, monospace;
 }
-
+#myCanvas {
+    background: lightgrey;
+}
 #verticalButtons {
     margin-left: 10px;
     display: flex;
     flex-direction: column;
     gap: 5px;
 }
-
 button {
     border: none;
     border-radius: 5px;
@@ -30,11 +32,7 @@ button:hover {
     background: blue;
 }
 
-#myCanvas {
-    background: lightgrey;
-}
-
-div.stats {
+div.info-box {
     position: absolute;
     left: 0;
     top: 0;
@@ -42,7 +40,24 @@ div.stats {
     padding: 15px;
     padding-right: 100px;
 }
-
-div.stats h3, div.stats p {
-    display: inline;
+div.col {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+div.row {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+p {
+    font-size: 20px;
+}
+.separator {
+    display: block;
+    height: 1px;
+    width: calc(100% + 115px);
+    margin: 20px 0 20px 0;
+    background-color: black;
+    transform: translateX(-15px);
 }
