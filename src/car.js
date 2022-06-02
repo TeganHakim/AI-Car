@@ -1,8 +1,9 @@
 class Car {
-    constructor(x, y, width, height, controlType, maxSpeed = 4, color = "blue", carType = "car") {
+    constructor(x, y, width, height, controlType, maxSpeed = 4, color = "red", carType = "car") {
         this.fitness;
         this.x = x;
         this.y = y;
+        this.color = color;
         if (carType == "car") {
             this.width = width;
             this.height = height;
@@ -10,8 +11,11 @@ class Car {
             this.width = width + 15;
             this.height = height + 50;
         }
+    
         this.controlType = controlType;
-        this.radius = 100;
+        this.radius = 80;
+        this.radiusAngle = 0;
+        this.sonarAngle = 0;
 
         this.speed = 0;
         this.turnSpeed = 0.02;
@@ -39,7 +43,7 @@ class Car {
 
         const maskCtx = this.mask.getContext("2d");
         this.img.onload = () => {
-            maskCtx.fillStyle = color;
+            maskCtx.fillStyle = this.color;
             maskCtx.rect(0, 0, this.width, this.height);
             maskCtx.fill();
 
@@ -86,8 +90,10 @@ class Car {
 
     #checkRadius(traffic) {
         for (let i = 0; i < traffic.length; i++) {
-            if (Math.hypot(this.x - traffic[i].x, this.y - traffic[i].y) < this.radius) {
-                return true;
+            for (let j = 0; j < traffic[i].polygon.length; j++) {
+                if (Math.hypot(this.x - traffic[i].polygon[j].x, this.y - traffic[i].polygon[j].y) < this.radius) {
+                    return true;
+                }
             }
         }
         return false;
@@ -182,13 +188,19 @@ class Car {
                 this.angle += this.turnSpeed;
             }
         }
-    }
 
-    draw(ctx, drawSensor = false, drawRadius = false) {
-        if (this.sensor && drawSensor) {
+    }
+    
+    draw(ctx, showDebug = false, drawSensor = false, drawRadius = false) {
+        ctx.globalAlpha = this.alpha;
+
+        this.radiusAngle = -timeElapsed * 0.8;
+        this.sonarAngle = -timeElapsed;
+        
+        if (this.sensor && drawSensor && showDebug) {
             this.sensor.draw(ctx);
         }
-       
+        
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.rotate(-this.angle);
@@ -196,13 +208,31 @@ class Car {
             ctx.drawImage(this.mask, -this.width / 2, - this.height / 2, this.width, this.height);
             ctx.globalCompositeOperation = "multiply";
         }
+        
         ctx.drawImage(this.img, -this.width / 2, - this.height / 2, this.width, this.height);
         ctx.restore();
         
-        if (drawRadius) {
+        if (drawRadius && !this.damaged && showDebug) {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.radiusAngle);
+            ctx.setLineDash([15, 15]);
             ctx.beginPath();
-            ctx.ellipse(this.x, this.y, this.radius, this.radius, 0, 0, 2 * Math.PI);
+            ctx.strokeStyle = this.#checkRadius(traffic) ? "red" : "green";
+            ctx.ellipse(0, 0, this.radius, this.radius, 0, 0, 2 * Math.PI);
             ctx.stroke();
+            ctx.fillStyle = this.#checkRadius(traffic) ? "red" : "green";
+            ctx.globalAlpha = 0.1;
+            ctx.fill();
+            ctx.restore();
+            
+            ctx.save();
+            ctx.beginPath();
+            ctx.strokeStyle = this.#checkRadius(traffic) ? "red" : "green";
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x - Math.sin(this.sonarAngle) * this.radius, this.y - Math.cos(this.sonarAngle) * this.radius);
+            ctx.stroke();
+            ctx.restore();
         }
     }
 }

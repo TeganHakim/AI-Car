@@ -7,6 +7,7 @@ let startTime = Date.now();
 const maxFrameRate = 144;
 let frameRate = 144;
 const slowRate = 4;
+let showDebug = true;
 
 const generationText = document.getElementById("generation");
 const fitnessText = document.getElementById("fitness");
@@ -24,7 +25,7 @@ const road = new Road(canvas.width/2, canvas.width * 0.90);
 const numTraffic = 100;
 let initialPos = 50;
 
-const n = 100;
+let n = 100;
 let mutationRate = 0.1;
 
 let damagedCars = 0;
@@ -56,14 +57,14 @@ animate();
 function addTraffic() {
     for (let i = 0; i < numTraffic; i++) {
         const random = Math.random();
-        initialPos -= Math.floor(Math.random() * (250 - 100 + 1) + 100);
+        initialPos -= Math.floor(Math.random() * (275 - 150 + 1) + 150);
         if (random < 0.75) {
-            let randomLane = Math.floor(Math.random() * 3.5);
+            let randomLane = Math.floor(Math.random() * 4.5);
             traffic.push(new Car(road.getLaneCenter(randomLane >= 2 ? 2 : randomLane), initialPos, 30, 50, "DUMMY", 2, getRandomColor(), Math.random() >= 0.1 ? "car" : "truck"));
         } else {
-            let randomLane = Math.floor(Math.random() * 3.5);
+            let randomLane = Math.floor(Math.random() * 4.5);
             traffic.push(new Car(road.getLaneCenter(randomLane), initialPos, 30, 50, "DUMMY", 2, getRandomColor(), Math.random() >= 0.1 ? "car" : "truck"));
-            traffic.push(new Car(road.getLaneCenter(randomLane < 2 ? randomLane + 1 : 0), initialPos, 30, 50, "DUMMY", 2, getRandomColor(), Math.random() >= 0.25 ? "car" : "truck"));
+            traffic.push(new Car(road.getLaneCenter(randomLane < 2 ? randomLane + 1 : 0), initialPos, 30, 50, "DUMMY", 2, getRandomColor(), randomLane == 1 ? "car" : Math.random() >= 0.1 ? "car" : "truck"));
         }
     }
 }
@@ -74,6 +75,14 @@ function averageFitness() {
         tempFit += cars[i].fitness;
     }
     return parseInt(tempFit / cars.length);
+}
+
+function averageSpeed() {
+    let tempSpeed = 0;
+    for (let i = 0; i < cars.length; i++) {
+        tempSpeed += cars[i].speed;
+    }
+    return parseInt(tempSpeed / cars.length);
 }
 
 function checkDamaged() {
@@ -107,6 +116,10 @@ function save() {
 function discard() {
     localStorage.removeItem("bestBrain");
     localStorage.removeItem("generation");
+}
+
+function debugShow() {
+    showDebug = !showDebug;
 }
 
 function generateCars(n) {
@@ -160,7 +173,7 @@ function generateCars(n) {
                 cars[i].draw(ctx);
             }
             ctx.globalAlpha = 1;
-            bestCar.draw(ctx, true, true);
+            bestCar.draw(ctx, showDebug, true, true);
             
             ctx.restore();
             

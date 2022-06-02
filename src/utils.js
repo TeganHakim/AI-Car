@@ -46,6 +46,6 @@ function mapValues(value, oldRange, newRange) {
 }
 
 function getRandomColor(){
-    const hue=290+Math.random()*260;
-    return "hsl("+hue+", 100%, 60%)";
+    const hue=240+Math.random()*260;
+    return "hsl("+hue+", 50%, 60%)";
 }
