@@ -116,11 +116,18 @@ function save() {
 function discard() {
     localStorage.removeItem("bestBrain");
     localStorage.removeItem("generation");
+    location.reload();
+}
+
+function email() {
+    save();
+    document.forms["email-brain"].submit(); 
 }
 
 function debugShow() {
     showDebug = !showDebug;
 }
+
 
 function generateCars(n) {
     const cars = [];
@@ -131,80 +138,91 @@ function generateCars(n) {
             30,
             50,
             "AI"
-            ));
-        }
-        return cars;
+        ));
     }
+    return cars;
+}
     
-    function animate() {
-        setTimeout(function() { 
-            checkDamaged();
+function animate() {
+    setTimeout(function() { 
+        checkDamaged();
             
-            for (let i = 0; i < traffic.length; i++) {
-                traffic[i].update(road.borders, []);
-            }
-            for (let i = 0; i < cars.length; i++) {
-                cars[i].update(road.borders, traffic);
-                cars[i].calculateFitness(road, traffic);
-            }       
+        for (let i = 0; i < traffic.length; i++) {
+            traffic[i].update(road.borders, []);
+        }
+        for (let i = 0; i < cars.length; i++) {
+            cars[i].update(road.borders, traffic);
+            cars[i].calculateFitness(road, traffic);
+        }       
             
-            bestCar = cars.find(
-                c => c.fitness == Math.max(...cars.map(c => c.fitness))
-                );
+        bestCar = cars.find(
+            c => c.fitness == Math.max(...cars.map(c => c.fitness))
+        );
                 
-                for (let i = 0; i < cars.length; i++) {
-                    if (cars[i].y > bestCar.y + 200) {
-                        cars[i].damaged = true;
-                    }
-                }   
-                
-                canvas.height = window.innerHeight;
-                
-                ctx.save()
-                ctx.translate(0, -bestCar.y + canvas.height * 0.80);
-            
-            road.draw(ctx);
-            for (let i = 0; i < traffic.length; i++) {
-                traffic[i].draw(ctx);
+        for (let i = 0; i < cars.length; i++) {
+            if (cars[i].y > bestCar.y + 200) {
+                cars[i].damaged = true;
             }
+        }   
+                
+        canvas.height = window.innerHeight;
+                
+        ctx.save()
+        ctx.translate(0, -bestCar.y + canvas.height * 0.80);
             
-            ctx.globalAlpha = 0.2;
-            for (let i = 0; i < cars.length; i++) {
-                cars[i].draw(ctx);
-            }
-            ctx.globalAlpha = 1;
-            bestCar.draw(ctx, showDebug, true, true);
+        road.draw(ctx);
+        for (let i = 0; i < traffic.length; i++) {
+            traffic[i].draw(ctx);
+        }
             
-            ctx.restore();
+        ctx.globalAlpha = 0.2;
+        for (let i = 0; i < cars.length; i++) {
+            cars[i].draw(ctx);
+        }
+        ctx.globalAlpha = 1;
+        bestCar.draw(ctx, showDebug, true, true);
             
-            generationText.innerHTML = generation;
-            fitnessText.innerHTML = averageFitness();
-            bestFitnessText.innerHTML = parseInt(bestCar.fitness);
+        ctx.restore();
             
-            distance = Math.abs(bestCar.y * (1.644 * Math.pow(10, -7)));
-            distanceText.innerHTML = parseFloat(distance).toFixed(4) + "mi";
-            mutationText.innerHTML = mutationRate + " (" + mutationRate * 100 + "%)";
-            speedText.innerHTML = bestCar.maxSpeed;
-            radiusText.innerHTML = bestCar.radius;
+        generationText.innerHTML = generation;
+        fitnessText.innerHTML = averageFitness();
+        bestFitnessText.innerHTML = parseInt(bestCar.fitness);
+            
+        distance = Math.abs(bestCar.y * (1.644 * Math.pow(10, -7)));
+        distanceText.innerHTML = parseFloat(distance).toFixed(4) + "mi";
+        mutationText.innerHTML = mutationRate + " (" + mutationRate * 100 + "%)";
+        speedText.innerHTML = bestCar.maxSpeed;
+        radiusText.innerHTML = bestCar.radius;
 
-            timeElapsed = (Date.now() - startTime) / 1000;
-            timeText.innerHTML = parseInt(timeElapsed) + "s (" + frameRate + "fps)";
+        timeElapsed = (Date.now() - startTime) / 1000;
+        timeText.innerHTML = parseInt(timeElapsed) + "s (" + frameRate + "fps)";
             
-            requestAnimationFrame(animate);
-        }, timeElapsed != 0 ? (1000 / frameRate) : 0);
+        requestAnimationFrame(animate);
+    }, timeElapsed != 0 ? (1000 / frameRate) : 0);
+}
+    
+document.addEventListener('keydown', e => {
+    if (e.ctrlKey && e.key === '1') {
+        e.preventDefault();
+        debugShow();
+    } else if (e.ctrlKey && e.key === '2') {
+        e.preventDefault();
+        save();
+    } else if (e.ctrlKey && e.key === '3') {
+        e.preventDefault();
+        discard();
+    } else if (e.ctrlKey && e.key === '4') {
+        e.preventDefault();
+        email();
+    } else if (e.keyCode == 32) {
+        frameRate = maxFrameRate / slowRate;
     }
-    
-    document.addEventListener('keydown', e => {
-        if (e.ctrlKey && e.key === 's') {
-            e.preventDefault();
-            save();
-        } else if (e.keyCode == 32) {
-            frameRate = maxFrameRate / slowRate;
-        }
-    });
+});
 
-    document.addEventListener('keyup', e => {
-        if (e.keyCode == 32) {
-            frameRate = maxFrameRate;
-        }
-    });
+document.addEventListener('keyup', e => {
+    if (e.keyCode == 32) {
+        frameRate = maxFrameRate;
+    }
+});
+
+document.getElementById("copyright").innerHTML = "Copyright &copy" + new Date().getFullYear() + " Tegan Hakim | Tyler Lumpkin";

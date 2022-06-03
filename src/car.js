@@ -35,7 +35,7 @@ class Car {
         this.controls = new Controls(controlType);
 
         this.img = new Image();
-        this.img.src = carType == "car" ? "/img/car.png" : "/img/truck.png";
+        this.img.src = carType == "car" ? "/img/cars/car.png" : "/img/cars/truck.png";
 
         this.mask = document.createElement("canvas");
         this.mask.width = this.width;

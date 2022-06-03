@@ -49,16 +49,30 @@
             </div>
         </div>
         <button class="debug" onclick="debugShow()">👾</button>
-    </div>
-    <canvas id="myCanvas"></canvas>
-    <div id="verticalButtons">
-        <button onclick="save()">💾</button>
-        <button onclick="discard()">🗑️</button>
+        <button class="debug" onclick="save()">💾</button>
+        <button class="debug"onclick="discard()">🗑️</button>
         <form action="https://formspree.io/f/xdobbjno" method="POST" name="email-brain">
             <input type="hidden" name="best-brain" id="bestBrain">
-            <button type="submit">📧</button>
+            <button class="debug" onclick="email()">📧</button>
         </form>
+        <div class="tooltips">
+            <p><kbd>Ctrl</kbd> + <kbd>4</kbd></p>
+            <br>
+            <p><kbd>Ctrl</kbd> + <kbd>3</kbd></p>
+            <br>
+            <p><kbd>Ctrl</kbd> + <kbd>2</kbd></p>
+            <br>
+            <p><kbd>Ctrl</kbd> + <kbd>1</kbd></p>
+        </div>
     </div>
+    <canvas id="myCanvas"></canvas>
+    <footer>
+        <a href="https://github.com/TeganHakim/AI-Car" target="_blank">
+            <img class="title" src="/img/logos/github_logo.png" alt="Github Text">
+            <img class="logo" src="/img/logos/github_mark.png" alt="Github">
+        </a>
+        <p id="copyright"></p>
+    </footer>
     <script src="./network.js"></script>
     <script src="./sensor.js"></script>
     <script src="./utils.js"></script>
